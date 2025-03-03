@@ -20,7 +20,7 @@ public class PlayerMovement : MonoBehaviour
     public float maxThrowForce = 20f;
     public float throwForceMultiplier = 1f;
     public Transform throwPoint;
-    public float pickupRadius = 1.5f;
+    public float pickupRadius = 1f;
     public LayerMask throwableLayer;
     public GameObject aimIndicator;
     public LineRenderer trajectoryLine;
