@@ -13,7 +13,8 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask groundMask;
     public bool grounded;
     float xInput;
-    float yInput;
+
+    private Portal currentPortal;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start() {
@@ -22,6 +23,12 @@ public class PlayerMovement : MonoBehaviour
 
     // Update is called once per frame
     void Update() {
+        if (currentPortal != null && Input.GetKeyDown(KeyCode.W)) {
+            if (currentPortal.exitPoint != null) {
+                transform.position = currentPortal.exitPoint.position;
+            }
+        }
+
         GetInput();
         HandleJump();
     }
@@ -34,7 +41,6 @@ public class PlayerMovement : MonoBehaviour
 
     void GetInput() {
         xInput = Input.GetAxis("Horizontal");
-        yInput = Input.GetAxis("Vertical");
     }
 
     void MoveWithInput() {
@@ -61,6 +67,25 @@ public class PlayerMovement : MonoBehaviour
     void ApplyFriction() {
         if (grounded && xInput == 0 && body.linearVelocityY <= 0) {
             body.linearVelocity *= groundDecay;
+        }
+    }
+
+    // Detect portal triggers.
+    private void OnTriggerEnter2D(Collider2D collision) {
+        if(collision.CompareTag("Portal")) {
+            Portal portal = collision.GetComponent<Portal>();
+            if(portal != null) {
+                currentPortal = portal;
+            }
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision) {
+        if(collision.CompareTag("Portal")) {
+            Portal portal = collision.GetComponent<Portal>();
+            if(portal != null && portal == currentPortal) {
+                currentPortal = null;
+            }
         }
     }
 }
