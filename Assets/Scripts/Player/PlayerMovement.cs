@@ -233,26 +233,22 @@ public class PlayerMovement : MonoBehaviour
             );
         }
         
-        // Update trajectory line
-        UpdateTrajectoryLine(throwPoint.position, direction * currentThrowForce);
+        // Update direction line instead of trajectory
+        UpdateDirectionLine(throwPoint.position, mousePos);
     }
-    
-    private void UpdateTrajectoryLine(Vector2 startPos, Vector2 initialVelocity) {
-        float timeStep = 0.1f;
-        float maxTime = 3f;
-        int steps = trajectoryLine.positionCount;
+
+    private void UpdateDirectionLine(Vector2 startPos, Vector2 endPos) {
+        // Set only two points for the line renderer
+        trajectoryLine.positionCount = 2;
         
-        Vector2 gravity = Physics2D.gravity;
-        float throwableMass = heldObject != null ? heldObject.mass : 1f;
+        // Set the start and end points
+        trajectoryLine.SetPosition(0, startPos);
+        trajectoryLine.SetPosition(1, endPos);
         
-        for (int i = 0; i < steps; i++) {
-            float time = i * timeStep;
-            if (time > maxTime) break;
-            
-            // Physics formula: position = initialPosition + initialVelocity * time + 0.5 * acceleration * time^2
-            Vector2 pos = startPos + initialVelocity * time + 0.5f * gravity * time * time;
-            trajectoryLine.SetPosition(i, pos);
-        }
+        // Optionally adjust line width based on throw force
+        float widthRatio = currentThrowForce / maxThrowForce;
+        trajectoryLine.startWidth = 0.1f * widthRatio;
+        trajectoryLine.endWidth = 0.05f * widthRatio;
     }
     
     private void ThrowObject() {
