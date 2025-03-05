@@ -15,6 +15,9 @@ public class PlayerMovement : MonoBehaviour
     float xInput;
 
     private Portal currentPortal;
+
+    private bool isInTrap = false;
+    private float slowdownFactor = 0.15f;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start() {
@@ -28,7 +31,6 @@ public class PlayerMovement : MonoBehaviour
                 transform.position = currentPortal.exitPoint.position;
             }
         }
-
         GetInput();
         HandleJump();
     }
@@ -44,18 +46,20 @@ public class PlayerMovement : MonoBehaviour
     }
 
     void MoveWithInput() {
-        if(Math.Abs(xInput) > 0) {
+        if (Mathf.Abs(xInput) > 0) {
             float increment = xInput * acceleration;
-            float newSpeed = Math.Clamp(body.linearVelocityX + increment, -groundSpeed, groundSpeed);
+            float speed = isInTrap ? groundSpeed * slowdownFactor : groundSpeed;
+            float newSpeed = Mathf.Clamp(body.linearVelocityX + increment, -speed, speed);
             body.linearVelocity = new Vector2(newSpeed, body.linearVelocityY);
 
-            float direction = Math.Sign(xInput);
+            float direction = Mathf.Sign(xInput);
             transform.localScale = new Vector3(direction, 1, 1);
         }
     }
 
+
     void HandleJump() {
-        if(Input.GetButtonDown("Jump") && grounded) {
+        if(Input.GetButtonDown("Jump") && grounded && !isInTrap) {
             body.linearVelocity = new Vector2(body.linearVelocityX, jumpSpeed);
         }
     }
@@ -70,13 +74,17 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // Detect portal triggers.
+    // Detect portal triggers
     private void OnTriggerEnter2D(Collider2D collision) {
         if(collision.CompareTag("Portal")) {
             Portal portal = collision.GetComponent<Portal>();
             if(portal != null) {
                 currentPortal = portal;
             }
+        }
+
+        if (collision.CompareTag("SlowdownTrap")) {
+            isInTrap = true;
         }
     }
 
@@ -86,6 +94,10 @@ public class PlayerMovement : MonoBehaviour
             if(portal != null && portal == currentPortal) {
                 currentPortal = null;
             }
+        }
+
+        if (collision.CompareTag("SlowdownTrap")) {
+            isInTrap = false;
         }
     }
 }
