@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour
         // Init UI
         if (keyStatusText != null) {
             keyStatusText.text = "Find the key!";
-            keyStatusText.color = Color.white;
+            keyStatusText.color = Color.black;
         }
 
         if (gameOverPanel != null) {
@@ -107,7 +107,7 @@ public class GameManager : MonoBehaviour
 
         if (keyStatusText != null) {
             keyStatusText.text = "Key found! Now open the vault!";
-            keyStatusText.color = Color.green;
+            keyStatusText.color = Color.yellow;
         }
     }
 
@@ -143,7 +143,7 @@ public class GameManager : MonoBehaviour
             if (gameOverText != null) {
                 if (playerWon) {
                     gameOverText.text = "VAULT CRACKED!";
-                    gameOverText.color = Color.green;
+                    gameOverText.color = Color.yellow;
                 } else {
                     gameOverText.text = "TIME'S UP!";
                     gameOverText.color = Color.red;
