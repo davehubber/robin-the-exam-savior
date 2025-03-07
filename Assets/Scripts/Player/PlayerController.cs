@@ -24,6 +24,9 @@ public class PlayerController : MonoBehaviour
     public LayerMask throwableLayer;
     public GameObject aimIndicator;
     public LineRenderer trajectoryLine;
+
+    [Header("Game Integration")]
+    public bool canInteractWithObjects = true;
     
     // State variables
     private Throwable heldObject;
@@ -59,6 +62,12 @@ public class PlayerController : MonoBehaviour
 
     // Update is called once per frame
     void Update() {
+        // Check if game is over
+        if (GameManager.Instance != null && GameManager.Instance.isGameOver) {
+            DisableControls();
+            return;
+        }
+
         // Handle throwable pickup - prioritize over portal use
         if (Input.GetKeyDown(KeyCode.W)) {
             Throwable nearestThrowable = FindNearestThrowable();
@@ -286,6 +295,12 @@ public class PlayerController : MonoBehaviour
             }
             trajectoryLine.enabled = false;
         }
+    }
+
+    public void DisableControls() {
+        canMove = false;
+        canInteractWithObjects = false;
+        ReleaseHeldObject();
     }
     
     void OnDrawGizmosSelected() {
