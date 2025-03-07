@@ -44,7 +44,7 @@ public class Vault : MonoBehaviour
     
     void Update()
     {
-        if (playerInRange && Input.GetKeyDown(KeyCode.E))
+        if (playerInRange && Input.GetKeyDown(KeyCode.W))
         {
             TryOpenVault();
         }
