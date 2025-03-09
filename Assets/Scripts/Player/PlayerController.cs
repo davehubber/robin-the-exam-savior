@@ -16,6 +16,9 @@ public class PlayerController : MonoBehaviour
     float xInput;
     private Portal currentPortal;
 
+    private bool isInTrap = false;
+    private float slowdownFactor = 0.15f;
+
     [Header("Throwing")]
     public float maxThrowForce = 20f;
     public float throwForceMultiplier = 1f;
@@ -138,7 +141,8 @@ public class PlayerController : MonoBehaviour
     void MoveWithInput() {
         if(Math.Abs(xInput) > 0) {
             float increment = xInput * acceleration;
-            float newSpeed = Math.Clamp(body.linearVelocity.x + increment, -groundSpeed, groundSpeed);
+            float speed = isInTrap ? groundSpeed * slowdownFactor : groundSpeed;
+            float newSpeed = Mathf.Clamp(body.linearVelocityX + increment, -speed, speed);
             body.linearVelocity = new Vector2(newSpeed, body.linearVelocity.y);
             float direction = Math.Sign(xInput);
             transform.localScale = new Vector3(direction, 1, 1);
@@ -146,7 +150,7 @@ public class PlayerController : MonoBehaviour
     }
 
     void HandleJump() {
-        if(Input.GetButtonDown("Jump") && grounded) {
+        if(Input.GetButtonDown("Jump") && grounded && !isInTrap) {
             body.linearVelocity = new Vector2(body.linearVelocity.x, jumpSpeed);
         }
     }
@@ -169,6 +173,10 @@ public class PlayerController : MonoBehaviour
                 currentPortal = portal;
             }
         }
+
+        if (collision.CompareTag("SlowdownTrap")) {
+            isInTrap = true;
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision) {
@@ -177,6 +185,10 @@ public class PlayerController : MonoBehaviour
             if(portal != null && portal == currentPortal) {
                 currentPortal = null;
             }
+        }
+
+        if (collision.CompareTag("SlowdownTrap")) {
+            isInTrap = false;
         }
     }
     
