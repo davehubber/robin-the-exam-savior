@@ -37,6 +37,10 @@ public class PlayerController : MonoBehaviour
     private float currentThrowForce = 0f;
     private bool canMove = true;
 
+    private bool isSpeedBoosted = false;
+    private float speedBoostMultiplier = 1f;
+    private float speedBoostEndTime = 0f;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start() {
         if (throwPoint == null)
@@ -116,6 +120,12 @@ public class PlayerController : MonoBehaviour
                 trajectoryLine.enabled = false;
             }
         }
+
+        if (isSpeedBoosted && Time.time >= speedBoostEndTime)
+        {
+            isSpeedBoosted = false;
+            speedBoostMultiplier = 1f; // Reset speed
+        }
         
         // Only get movement input if we can move
         if (canMove) {
@@ -141,7 +151,7 @@ public class PlayerController : MonoBehaviour
     void MoveWithInput() {
         if(Math.Abs(xInput) > 0) {
             float increment = xInput * acceleration;
-            float speed = isInTrap ? groundSpeed * slowdownFactor : groundSpeed;
+            float speed = (isInTrap ? groundSpeed * slowdownFactor : groundSpeed) * speedBoostMultiplier;
             float newSpeed = Mathf.Clamp(body.linearVelocityX + increment, -speed, speed);
             body.linearVelocity = new Vector2(newSpeed, body.linearVelocity.y);
             float direction = Math.Sign(xInput);
@@ -315,7 +325,17 @@ public class PlayerController : MonoBehaviour
         canInteractWithObjects = false;
         ReleaseHeldObject();
     }
-    
+
+    public void ActivateSpeedBoost(float multiplier, float duration)
+    {
+        if (!isSpeedBoosted) // Apply boost only if not already active
+        {
+            isSpeedBoosted = true;
+            speedBoostMultiplier = multiplier;
+            speedBoostEndTime = Time.time + duration;
+        }
+    }
+
     void OnDrawGizmosSelected() {
         // Draw pickup radius in editor
         Gizmos.color = Color.yellow;
