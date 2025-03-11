@@ -118,7 +118,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void GameOver(bool won) {
+    public void GameOver(bool won, string customLossMessage = "") {
         isGameOver = true;
         playerWon = won;
 
@@ -133,10 +133,10 @@ public class GameManager : MonoBehaviour
             playerScore = 0;
         }
 
-        ShowGameOverScreen();
+        ShowGameOverScreen(customLossMessage);
     }
 
-    private void ShowGameOverScreen() {
+    private void ShowGameOverScreen(string customLossMessage) {
         if (gameOverPanel != null) {
             gameOverPanel.SetActive(true);
 
@@ -145,7 +145,7 @@ public class GameManager : MonoBehaviour
                     gameOverText.text = "VAULT CRACKED!";
                     gameOverText.color = Color.yellow;
                 } else {
-                    gameOverText.text = "TIME'S UP!";
+                    gameOverText.text = customLossMessage != "" ? customLossMessage : "TIME'S UP!";
                     gameOverText.color = Color.red;
                 }
             }
