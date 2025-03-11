@@ -145,7 +145,8 @@ public class PlayerController : MonoBehaviour
             float newSpeed = Mathf.Clamp(body.linearVelocityX + increment, -speed, speed);
             body.linearVelocity = new Vector2(newSpeed, body.linearVelocity.y);
             float direction = Math.Sign(xInput);
-            transform.localScale = new Vector3(direction, 1, 1);
+            Vector3 currentScale = transform.localScale;
+            transform.localScale = new Vector3(Mathf.Abs(currentScale.x) * direction, currentScale.y, currentScale.z);
         }
     }
 
