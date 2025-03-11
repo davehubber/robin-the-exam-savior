@@ -320,6 +320,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void EnableControls() {
+        canMove = true;
+        canInteractWithObjects = true;
+    }
+
     public void DisableControls() {
         canMove = false;
         canInteractWithObjects = false;
