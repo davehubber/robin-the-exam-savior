@@ -10,6 +10,8 @@ TagManager:
   - SlowdownTrap
   - SpeedBoost
   - Laser
+  - Throwable
+  - HidingSpot
   layers:
   - Default
   - TransparentFX
@@ -19,9 +21,9 @@ TagManager:
   - UI
   - Ground
   - Player
-  - Throwable
-  - PlayerOnRope
-  - HiddenPlayer
+  - Interactable
+  - NPC
+  - 
   - 
   - 
   - 

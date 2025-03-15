@@ -1,4 +1,4 @@
-using System;
+/*using System;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -347,3 +347,4 @@ public class PlayerController : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, pickupRadius);
     }
 }
+*/

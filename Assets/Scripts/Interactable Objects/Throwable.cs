@@ -2,48 +2,23 @@ using UnityEngine;
 
 public class Throwable : MonoBehaviour
 {
-    public float mass = 1f;
-    private Rigidbody2D rb;
-    private Collider2D coll;
-    private bool isPickedUp = false;
+    private bool isLaunched = false;
+    private Vector2 launchVelocity;
+    [SerializeField] private float customGravity = 9.81f;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public void Launch(Vector2 direction, float force)
     {
-        rb = GetComponent<Rigidbody2D>();
-        coll = GetComponent<Collider2D>();
-        
-        if (rb == null)
+        isLaunched = true;
+        launchVelocity = direction.normalized * force;
+        transform.SetParent(null);
+    }
+
+    private void Update()
+    {
+        if (isLaunched)
         {
-            rb = gameObject.AddComponent<Rigidbody2D>();
-            rb.mass = mass;
+            transform.position += (Vector3)(launchVelocity * Time.deltaTime);
+            launchVelocity += Vector2.down * customGravity * Time.deltaTime;
         }
-        
-        if (coll == null)
-        {
-            gameObject.AddComponent<CircleCollider2D>();
-        }
-    }
-
-    public void PickUp()
-    {
-        isPickedUp = true;
-        rb.simulated = false; // Disable physics when picked up
-    }
-    
-    public void Release()
-    {
-        isPickedUp = false;
-        rb.simulated = true; // Re-enable physics when thrown
-    }
-
-    public void Throw(Vector2 force)
-    {
-        Release();
-        rb.AddForce(force, ForceMode2D.Impulse);
-    }
-
-    public bool IsPickedUp() {
-        return isPickedUp;
     }
 }

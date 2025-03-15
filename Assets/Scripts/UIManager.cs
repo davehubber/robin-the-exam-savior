@@ -91,9 +91,9 @@ public class UIManager : MonoBehaviour
         }
     }
     
-    private void OnGameOver(bool playerWon)
+    private void OnGameOver(bool playerWon, string customLossMessage)
     {
-        ShowGameOverScreen(playerWon);
+        ShowGameOverScreen(playerWon, customLossMessage);
     }
     
     private void UpdateKeyStatus(bool hasKey)

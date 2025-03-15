@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
 
     // Events
     public event Action OnKeyCollected;
-    public event Action<bool> OnGameOver;
+    public event Action<bool, string> OnGameOver;
     public event Action<float> OnTimeUpdated;
     
     // Singleton with proper scene loading handling
@@ -107,7 +107,7 @@ public class GameManager : MonoBehaviour
             playerScore = 0;
         }
 
-        OnGameOver?.Invoke(won);
+        OnGameOver?.Invoke(won, customLossMessage);
     }
 
     public float GetScore()

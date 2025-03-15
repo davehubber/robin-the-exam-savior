@@ -184,7 +184,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3796542332007480844}
   m_Layer: 0
-  m_Name: Entrance
+  m_Name: Passage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

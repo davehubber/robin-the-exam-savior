@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 
 public class RopeDescentController : MonoBehaviour
 {
@@ -240,3 +240,4 @@ public class RopeDescentController : MonoBehaviour
         return isOnRope;
     }
 }
+*/

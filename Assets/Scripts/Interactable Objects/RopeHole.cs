@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 
 public class RopeHole : MonoBehaviour
 {
@@ -41,3 +41,4 @@ public class RopeHole : MonoBehaviour
         }
     }
 }
+*/

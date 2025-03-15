@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 
 public class SpeedBoostCollectible : MonoBehaviour
 {
@@ -30,3 +30,4 @@ public class SpeedBoostCollectible : MonoBehaviour
         }
     }
 }
+*/

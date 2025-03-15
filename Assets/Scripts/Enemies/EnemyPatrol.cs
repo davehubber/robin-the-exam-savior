@@ -1,209 +1,192 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class EnemyPatrol : MonoBehaviour
 {
-    public GameObject pointA;
-    public GameObject pointB;
+    #region Patrol Settings
+    [Header("Patrol Settings")]
+    [SerializeField] private Transform pointA;
+    [SerializeField] private Transform pointB;
+    [SerializeField] private float speed = 2f;
+    [SerializeField] private float reachThreshold = 0.1f; // How close before switching target
+    #endregion
+
+    #region Player Detection Settings
+    [Header("Player Detection Settings")]
+    [SerializeField] private float detectionRange = 5f;
+    [SerializeField] private string playerTag = "Player";
+    [SerializeField] private string defeatMessage = "CAUGHT BY GUARD!";
+    [SerializeField] private float pathMarginX = 0.5f; // Extra margin around patrol path (X axis)
+    [SerializeField] private float pathMarginY = 1.0f; // Extra margin around patrol path (Y axis)
+
+    #endregion
 
     private Rigidbody2D rb;
-    private Transform currentPoint;
-    private Vector3 originalY;
-
-    public float speed;
-    public bool isMoving;
-    public float collisionRadius = 0.5f;
-
-    [Header("Player Detection")]
-    public float detectionRange = 5f;    // How far the enemy can see
-    public LayerMask playerLayer;        // Layer that contains the player
-    public string playerTag = "Player";  // Tag of the player object
-    public string hiddenLayerName = "HiddenPlayer"; // Layer for hidden players
-    public string defeatMessage = "CAUGHT BY GUARD!"; // Custom message when player is caught
-
+    private Transform currentTarget;
+    private Vector3 originalPosition;
     private Transform playerTransform;
-    private bool playerDetected = false;
-    private int hiddenLayer;
+    private MovementController playerMovementController;
+    private bool playerCaught = false;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        currentPoint = pointB.transform;
-        isMoving = true;
-        
-        // Store original Y position
-        originalY = transform.position;
-
-        // Find player reference
-        GameObject player = GameObject.FindGameObjectWithTag(playerTag);
-        if (player != null)
-        {
-            playerTransform = player.transform;
-        }
-        
-        // Get hidden layer
-        hiddenLayer = LayerMask.NameToLayer(hiddenLayerName);
-        
-        // Ensure rigidbody constraints are set properly
         if (rb != null)
         {
+            // Freeze rotation and keep Y position fixed for horizontal patrol.
             rb.constraints = RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY;
+        }
+
+        if (pointA == null || pointB == null)
+        {
+            Debug.LogError("EnemyPatrol: Patrol points are not assigned.");
+        }
+        else
+        {
+            currentTarget = pointB;
+        }
+        
+        originalPosition = transform.position;
+
+        // Locate the player by tag.
+        GameObject playerObj = GameObject.FindGameObjectWithTag(playerTag).transform.parent.gameObject;
+        if (playerObj != null)
+        {
+            playerTransform = playerObj.transform;
+            playerMovementController = playerObj.GetComponent<MovementController>();
+        }
+        else
+        {
+            Debug.LogError("EnemyPatrol: Player not found with tag " + playerTag);
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        // Skip updates if game is already over
-        if (GameManager.Instance != null && GameManager.Instance.isGameOver)
+        // Stop patrolling if the game is over or if the player has already been caught.
+        if ((GameManager.Instance != null && GameManager.Instance.isGameOver) || playerCaught)
         {
             rb.linearVelocity = Vector2.zero;
             return;
         }
 
-        // Handle patrol movement
-        if (isMoving)
-        {
-            HandlePatrol();
-        }
-
-        // Check for player detection
+        Patrol();
         DetectPlayer();
     }
 
-    private void HandlePatrol()
+    #region Patrol Movement
+    private void Patrol()
     {
-        // Set linearVelocity based on current target point, but only on X axis
-        if (currentPoint.position == pointB.transform.position)
+        // Move horizontally towards the current target.
+        float direction = Mathf.Sign(currentTarget.position.x - transform.position.x);
+        rb.linearVelocity = new Vector2(direction * speed, rb.linearVelocity.y);
+
+        // Flip sprite to face movement direction.
+        if (Mathf.Abs(direction) > 0.01f)
         {
-            rb.linearVelocity = new Vector2(speed, 0);
-        }
-        else
-        {
-            rb.linearVelocity = new Vector2(-speed, 0);
+            Vector3 scale = transform.localScale;
+            scale.x = Mathf.Abs(scale.x) * (direction > 0 ? 1 : -1);
+            transform.localScale = scale;
         }
 
-        // Check if reached destination point
-        Vector2 currentPos2D = new Vector2(transform.position.x, transform.position.y);
-        Vector2 targetPos2D = new Vector2(currentPoint.position.x, currentPoint.position.y);
-        
-        float distanceX = Mathf.Abs(currentPos2D.x - targetPos2D.x);
-        
-        if (distanceX < collisionRadius)
+        // Check if the enemy has reached (or is close enough to) the target.
+        if (Mathf.Abs(transform.position.x - currentTarget.position.x) <= reachThreshold)
         {
-            if (currentPoint == pointB.transform)
-            {
-                Flip();
-                currentPoint = pointA.transform;
-            }
-            else if (currentPoint == pointA.transform)
-            {
-                Flip();
-                currentPoint = pointB.transform;
-            }
+            currentTarget = (currentTarget == pointB) ? pointA : pointB;
+            Flip();
         }
-        
-        // Ensure Y position stays constant
-        if (Mathf.Abs(transform.position.y - originalY.y) > 0.01f)
+
+        // Ensure the enemy's Y position remains fixed.
+        if (Mathf.Abs(transform.position.y - originalPosition.y) > 0.01f)
         {
-            Vector3 fixedPosition = transform.position;
-            fixedPosition.y = originalY.y;
-            transform.position = fixedPosition;
+            Vector3 fixedPos = transform.position;
+            fixedPos.y = originalPosition.y;
+            transform.position = fixedPos;
         }
     }
+    #endregion
 
+    #region Player Detection
     private void DetectPlayer()
     {
-        // Skip detection if player reference is missing
-        if (playerTransform == null) return;
-        print(playerTransform);
-        // Skip detection if player is hiding
-        if (playerTransform.gameObject.layer == hiddenLayer) return;
+        if (playerTransform == null)
+            return;
+        
+        // Optionally skip detection if the player is hidden.
+        if (playerTransform.GetComponent<PlayerInteractionController>().isHidden)
+            return;
 
-        // Calculate distance to player
+        // Use overall distance for detection.
         float distanceToPlayer = Vector2.Distance(transform.position, playerTransform.position);
-
-        // Check if player is within detection range
         if (distanceToPlayer <= detectionRange)
         {
-            // Check if player is in the path between pointA and pointB
-            bool playerInPath = IsPointInPath(playerTransform.position);
-
-            if (playerInPath)
+            if (IsPlayerInPatrolPath() && IsFacingPlayer())
             {
-                // Check if enemy is facing the player (based on relative x position and local scale)
-                bool isFacingPlayer = IsFacingPlayer();
-
-                if (isFacingPlayer)
-                {
-                    // Player has been spotted and is in the enemy's line of sight
-                    if (!playerDetected)
-                    {
-                        playerDetected = true;
-                        CatchPlayer();
-                    }
-                }
+                CatchPlayer();
             }
         }
     }
 
-    private bool IsPointInPath(Vector3 point)
+    private bool IsPlayerInPatrolPath()
     {
-        // Create a slightly expanded rect/area between pointA and pointB to represent the patrol path
-        float minX = Mathf.Min(pointA.transform.position.x, pointB.transform.position.x) - 0.5f;
-        float maxX = Mathf.Max(pointA.transform.position.x, pointB.transform.position.x) + 0.5f;
-        float minY = Mathf.Min(pointA.transform.position.y, pointB.transform.position.y) - 1.0f;
-        float maxY = Mathf.Max(pointA.transform.position.y, pointB.transform.position.y) + 1.0f;
+        // Define a rectangular patrol area between pointA and pointB with added margins.
+        float minX = Mathf.Min(pointA.position.x, pointB.position.x) - pathMarginX;
+        float maxX = Mathf.Max(pointA.position.x, pointB.position.x) + pathMarginX;
+        float minY = Mathf.Min(pointA.position.y, pointB.position.y) - pathMarginY;
+        float maxY = Mathf.Max(pointA.position.y, pointB.position.y) + pathMarginY;
 
-        // Check if the point is within this rectangular area
-        return (point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY);
+        Vector3 playerPos = playerTransform.position;
+        return playerPos.x >= minX && playerPos.x <= maxX && playerPos.y >= minY && playerPos.y <= maxY;
     }
 
     private bool IsFacingPlayer()
     {
+        // Determine facing direction by local scale (assumes sprite is facing right by default).
         bool enemyFacingRight = transform.localScale.x > 0;
-        bool playerIsRightOfEnemy = playerTransform.position.x > transform.position.x;
-
-        // Enemy is facing the player if both conditions match
-        return (enemyFacingRight == playerIsRightOfEnemy);
+        bool playerIsRight = playerTransform.position.x > transform.position.x;
+        return enemyFacingRight == playerIsRight;
     }
+    #endregion
 
     private void CatchPlayer()
     {
-        // Access player controller and disable controls
-        PlayerController playerController = playerTransform.GetComponent<PlayerController>();
-        if (playerController != null)
-        {
-            playerController.DisableControls();
-        }
+        if (playerCaught)
+            return;
+        
+        playerCaught = true;
 
-        // Call game over with custom message
+        // Disable player's movement controls.
+        if (playerMovementController != null)
+        {
+            playerMovementController.DisableMovement();
+        }
+        
+        // Trigger game over with the defeat message.
         if (GameManager.Instance != null)
         {
             GameManager.Instance.GameOver(false, defeatMessage);
         }
-
-        // Stop the enemy movement
-        isMoving = false;
-        rb.linearVelocity = Vector2.zero;
     }
 
     private void Flip()
     {
-        Vector3 localScale = transform.localScale;
-        localScale.x *= -1;
-        transform.localScale = localScale;
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
     }
 
     private void OnDrawGizmos()
     {
-        // Draw patrol path
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(pointA.transform.position, collisionRadius);
-        Gizmos.DrawWireSphere(pointB.transform.position, collisionRadius);
-        Gizmos.DrawLine(pointA.transform.position, pointB.transform.position);
-
-        // Draw detection range
+        // Draw patrol points and path.
+        if (pointA != null && pointB != null)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(pointA.position, reachThreshold);
+            Gizmos.DrawWireSphere(pointB.position, reachThreshold);
+            Gizmos.DrawLine(pointA.position, pointB.position);
+        }
+        
+        // Draw detection range.
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
     }
