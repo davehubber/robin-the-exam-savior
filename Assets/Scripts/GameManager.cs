@@ -1,9 +1,6 @@
 using System;
-using TMPro;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,148 +13,121 @@ public class GameManager : MonoBehaviour
     public bool isVaultOpen = false;
     public bool isGameOver = false;
     public bool playerWon = false;
-
-    [Header("UI References")]
-    public TMP_Text timerText;
-    public TMP_Text keyStatusText;
-    public GameObject gameOverPanel;
-    public TMP_Text gameOverText;
-    public TMP_Text scoreText;
-    public Button restartButton;
-
+    
     // Private variables
     private float currentTime;
     private float playerScore;
 
-    // Singleton
+    // Events
+    public event Action OnKeyCollected;
+    public event Action<bool> OnGameOver;
+    public event Action<float> OnTimeUpdated;
+    
+    // Singleton with proper scene loading handling
     public static GameManager Instance { get; private set; }
 
-    private void Awake() {
-        // Singleton Setup
-        if (Instance != null && Instance != this) {
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
             Destroy(gameObject);
-        } else {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            return;
         }
+        
+        Instance = this;
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         InitializeGame();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (!isGameOver) {
+        if (!isGameOver)
+        {
             UpdateTimer();
             CheckTimeLimit();
         }
     }
 
-    private void InitializeGame() {
-        // Init game state
+    private void InitializeGame()
+    {
         currentTime = 0f;
         hasKey = false;
         isVaultOpen = false;
         isGameOver = false;
         playerWon = false;
-
-        // Init UI
-        if (keyStatusText != null) {
-            keyStatusText.text = "Find the key!";
-            keyStatusText.color = Color.black;
-        }
-
-        if (gameOverPanel != null) {
-            gameOverPanel.SetActive(false);
-        }
-
-        // Setup restart button
-        if (restartButton != null) {
-            restartButton.onClick.AddListener(RestartGame);
-        }
     }
 
-    private void UpdateTimer() {
+    private void UpdateTimer()
+    {
         currentTime += Time.deltaTime;
-
-        if(timerText != null) {
-            // Format as minutes:seconds
-            TimeSpan timeSpan = TimeSpan.FromSeconds(currentTime);
-            timerText.text = string.Format("{0:00}:{1:00}", timeSpan.Minutes, timeSpan.Seconds);
-
-            // Change color when time is running out (last 30 seconds)
-            if (timeLimit - currentTime <= 30f) {
-                timerText.color = Color.red;
-            }
-        }
+        OnTimeUpdated?.Invoke(currentTime);
     }
 
-    private void CheckTimeLimit() {
-        if (currentTime >= timeLimit && !playerWon) {
+    private void CheckTimeLimit()
+    {
+        if (currentTime >= timeLimit && !playerWon)
+        {
             GameOver(false);
         }
     }
 
-    public void CollectKey() {
+    public void CollectKey()
+    {
         hasKey = true;
-
-        if (keyStatusText != null) {
-            keyStatusText.text = "Key found! Now open the vault!";
-            keyStatusText.color = Color.yellow;
-        }
+        OnKeyCollected?.Invoke();
     }
 
-    public void OpenVault() {
-        if (hasKey) {
+    public void OpenVault()
+    {
+        if (hasKey)
+        {
             isVaultOpen = true;
             GameOver(true);
         }
     }
 
-    public void GameOver(bool won, string customLossMessage = "") {
+    public void GameOver(bool won, string customLossMessage = "")
+    {
+        if (isGameOver) return; // Prevent multiple calls
+        
         isGameOver = true;
         playerWon = won;
 
-        if (won) {
-            // Calculate time based on remaining time
+        if (won)
+        {
             float remainingTimePercentage = (timeLimit - currentTime) / timeLimit;
             playerScore = Mathf.Round(maxScore * remainingTimePercentage);
-
-            // Ensure minimum score if won
             playerScore = Mathf.Max(playerScore, 100);
-        } else {
+        }
+        else
+        {
             playerScore = 0;
         }
 
-        ShowGameOverScreen(customLossMessage);
+        OnGameOver?.Invoke(won);
     }
 
-    private void ShowGameOverScreen(string customLossMessage) {
-        if (gameOverPanel != null) {
-            gameOverPanel.SetActive(true);
-
-            if (gameOverText != null) {
-                if (playerWon) {
-                    gameOverText.text = "VAULT CRACKED!";
-                    gameOverText.color = Color.yellow;
-                } else {
-                    gameOverText.text = customLossMessage != "" ? customLossMessage : "TIME'S UP!";
-                    gameOverText.color = Color.red;
-                }
-            }
-        }
-
-        if (scoreText != null) {
-            scoreText.text = playerWon ? $"Score: {playerScore}" : "FAILED";
-        }
+    public float GetScore()
+    {
+        return playerScore;
     }
 
-    public void RestartGame() {
+    public string GetFormattedTime()
+    {
+        TimeSpan timeSpan = TimeSpan.FromSeconds(currentTime);
+        return string.Format("{0:00}:{1:00}", timeSpan.Minutes, timeSpan.Seconds);
+    }
+
+    public float GetRemainingTime()
+    {
+        return timeLimit - currentTime;
+    }
+    
+    public void RestartGame()
+    {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        InitializeGame();
     }
 }

@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System;
 
 public class UIManager : MonoBehaviour
 {
@@ -16,24 +17,118 @@ public class UIManager : MonoBehaviour
     public float pulseDuration = 0.5f;
     public float pulseScale = 1.2f;
     
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private GameManager gameManager;
+    
+    void Awake()
+    {
+        // Setup restart button
+        if (restartButton != null)
+        {
+            restartButton.onClick.AddListener(OnRestartButtonClicked);
+        }
+    }
+    
     void Start()
     {
-        // Initialize UI
+        gameManager = GameManager.Instance;
+        if (gameManager == null)
+        {
+            Debug.LogError("UIManager couldn't find GameManager!");
+            return;
+        }
+        
+        // Initialize UI state
+        UpdateKeyStatus(false);
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(false);
         }
         
-        // Ensure GameManager has references to UI elements
-        if (GameManager.Instance != null)
+        // Subscribe to GameManager events
+        gameManager.OnKeyCollected += OnKeyCollected;
+        gameManager.OnGameOver += OnGameOver;
+        gameManager.OnTimeUpdated += OnTimeUpdated;
+    }
+
+    void OnDestroy()
+    {
+        // Unsubscribe from events to prevent memory leaks
+        if (gameManager != null)
         {
-            GameManager.Instance.timerText = timerText;
-            GameManager.Instance.keyStatusText = keyStatusText;
-            GameManager.Instance.gameOverPanel = gameOverPanel;
-            GameManager.Instance.gameOverText = gameOverText;
-            GameManager.Instance.scoreText = scoreText;
-            GameManager.Instance.restartButton = restartButton;
+            gameManager.OnKeyCollected -= OnKeyCollected;
+            gameManager.OnGameOver -= OnGameOver;
+            gameManager.OnTimeUpdated -= OnTimeUpdated;
+        }
+        
+        // Remove button listeners
+        if (restartButton != null)
+        {
+            restartButton.onClick.RemoveListener(OnRestartButtonClicked);
+        }
+    }
+    
+    private void OnKeyCollected()
+    {
+        UpdateKeyStatus(true);
+        if (keyStatusText != null)
+        {
+            PulseText(keyStatusText);
+        }
+    }
+    
+    private void OnTimeUpdated(float currentTime)
+    {
+        if (timerText != null)
+        {
+            TimeSpan timeSpan = TimeSpan.FromSeconds(currentTime);
+            timerText.text = string.Format("{0:00}:{1:00}", timeSpan.Minutes, timeSpan.Seconds);
+            
+            // Change color when time is running out (last 30 seconds)
+            if (gameManager.GetRemainingTime() <= 30f)
+            {
+                timerText.color = Color.red;
+            }
+        }
+    }
+    
+    private void OnGameOver(bool playerWon)
+    {
+        ShowGameOverScreen(playerWon);
+    }
+    
+    private void UpdateKeyStatus(bool hasKey)
+    {
+        if (keyStatusText != null)
+        {
+            keyStatusText.text = hasKey ? "Key found! Now open the vault!" : "Find the key!";
+            keyStatusText.color = hasKey ? Color.yellow : Color.black;
+        }
+    }
+    
+    private void ShowGameOverScreen(bool playerWon, string customLossMessage = "")
+    {
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+            
+            if (gameOverText != null)
+            {
+                if (playerWon)
+                {
+                    gameOverText.text = "VAULT CRACKED!";
+                    gameOverText.color = Color.yellow;
+                }
+                else
+                {
+                    gameOverText.text = string.IsNullOrEmpty(customLossMessage) ? "TIME'S UP!" : customLossMessage;
+                    gameOverText.color = Color.red;
+                }
+            }
+            
+            if (scoreText != null)
+            {
+                scoreText.text = playerWon ? $"Score: {gameManager.GetScore()}" : "FAILED";
+            }
         }
     }
     
@@ -41,7 +136,6 @@ public class UIManager : MonoBehaviour
     {
         if (textElement != null)
         {
-            // Simple pulsing animation with a coroutine
             StartCoroutine(PulseCoroutine(textElement.transform));
         }
     }
@@ -73,5 +167,13 @@ public class UIManager : MonoBehaviour
         
         // Ensure scale is reset to original
         target.localScale = originalScale;
+    }
+    
+    private void OnRestartButtonClicked()
+    {
+        if (gameManager != null)
+        {
+            gameManager.RestartGame();
+        }
     }
 }
