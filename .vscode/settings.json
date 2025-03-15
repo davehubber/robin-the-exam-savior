@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Robin The Exam Savior.sln"
+    "dotnet.defaultSolution": "robin-the-exam-savior.sln"
 }
