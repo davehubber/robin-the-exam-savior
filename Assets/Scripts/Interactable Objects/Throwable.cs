@@ -2,23 +2,51 @@ using UnityEngine;
 
 public class Throwable : MonoBehaviour
 {
-    private bool isLaunched = false;
-    private Vector2 launchVelocity;
-    [SerializeField] private float customGravity = 9.81f;
+    [SerializeField] private float gravityScale = 1f;
+    
+    private Rigidbody2D rb;
+    private Collider2D physicsCollider;
 
-    public void Launch(Vector2 direction, float force)
+    private void Awake()
     {
-        isLaunched = true;
-        launchVelocity = direction.normalized * force;
-        transform.SetParent(null);
+        rb = GetComponent<Rigidbody2D>();
+        physicsCollider = GetComponentInChildren<Collider2D>();
+        
+        if (rb == null)
+        {
+            rb = gameObject.AddComponent<Rigidbody2D>();
+        }
+        
+        if (physicsCollider == null)
+        {
+            physicsCollider = gameObject.AddComponent<CircleCollider2D>();
+        }
+        
+        // Configure physics properties
+        rb.gravityScale = 0; // Start with no gravity
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation; // Optional: prevent rotation
     }
 
-    private void Update()
+    public void PickUp()
     {
-        if (isLaunched)
-        {
-            transform.position += (Vector3)(launchVelocity * Time.deltaTime);
-            launchVelocity += Vector2.down * customGravity * Time.deltaTime;
-        }
+        rb.linearVelocity = Vector2.zero;
+        rb.bodyType = RigidbodyType2D.Kinematic; // Make kinematic when picked up
+    }
+    
+    public void Launch(Vector2 direction, float force)
+    {
+        transform.SetParent(null);
+        
+        // Re-enable physics
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        rb.gravityScale = gravityScale;
+        
+        // Apply the force
+        rb.linearVelocity = direction * force;
+    }
+    
+    public float GetGravity()
+    {
+        return gravityScale * Physics2D.gravity.magnitude;
     }
 }
