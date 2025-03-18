@@ -68,8 +68,8 @@ public class PlayerInteractionController : MonoBehaviour
 
             // Set up a simple material for the line.
             aimLine.material = new Material(Shader.Find("Sprites/Default"));
-            aimLine.startColor = new Color(1f, 1f, 1f, 0.8f);
-            aimLine.endColor = new Color(1f, 1f, 1f, 0.8f);
+            aimLine.startColor = new Color(1f, 0f, 0f, 0.5f);
+            aimLine.endColor = new Color(1f, 0f, 0f, 0.5f);
         }
 
         // Setup ropeLine if not already assigned.
