@@ -75,7 +75,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 3
   m_Sprite: {fileID: -8165332880958724283, guid: 7840bdb3eac3e45489dfff230d4ace75, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -249,7 +249,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 3
   m_Sprite: {fileID: 8935535228743559482, guid: 196ab8fb1d5d646e285e3dd5a27834bb, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -374,8 +374,8 @@ Transform:
   m_GameObject: {fileID: 6000054574596577779}
   serializedVersion: 2
   m_LocalRotation: {x: 0.16533582, y: -0.51435906, z: -0.099778794, w: 0.83554953}
-  m_LocalPosition: {x: -0.21, y: 1.23, z: -0.2}
-  m_LocalScale: {x: 0.32, y: 3.58, z: 1}
+  m_LocalPosition: {x: -0.208, y: 1.23, z: -0.2}
+  m_LocalScale: {x: 0.33, y: 3.58, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3796542332007480844}
@@ -637,7 +637,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 3
   m_Sprite: {fileID: -8165332880958724283, guid: 7840bdb3eac3e45489dfff230d4ace75, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -724,7 +724,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 3
   m_Sprite: {fileID: 8935535228743559482, guid: 196ab8fb1d5d646e285e3dd5a27834bb, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -762,8 +762,8 @@ Transform:
   m_GameObject: {fileID: 9047164290631623064}
   serializedVersion: 2
   m_LocalRotation: {x: 0.16533576, y: 0.514359, z: 0.099778734, w: 0.8355496}
-  m_LocalPosition: {x: 0.21, y: 1.23, z: -0.2}
-  m_LocalScale: {x: 0.32, y: 3.58, z: 1}
+  m_LocalPosition: {x: 0.208, y: 1.228, z: -0.196}
+  m_LocalScale: {x: 0.33, y: 3.58, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3796542332007480844}
