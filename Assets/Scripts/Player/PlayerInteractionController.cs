@@ -364,8 +364,7 @@ public class PlayerInteractionController : MonoBehaviour
 
         // Compute new vertical position using rb.MovePosition for smoother movement.
         Vector2 pos = rb.position;
-        pos.y += verticalSpeed * Time.fixedDeltaTime;
-        //pos.y += verticalSpeed * Time.deltaTime;
+        pos.y += verticalSpeed * Time.deltaTime;
         float upperBound = ropeHoleTransform.position.y;
         float lowerBound = ropeHoleTransform.position.y - maxRopeDepth;
         pos.y = Mathf.Clamp(pos.y, lowerBound, upperBound);
