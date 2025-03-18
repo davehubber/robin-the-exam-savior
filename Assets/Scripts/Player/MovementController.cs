@@ -20,7 +20,7 @@ public class MovementController : MonoBehaviour
 
     #region Speed Boost
     private bool isSpeedBoosted = false;
-    private float speedBoostMultiplier = 1f;
+    private float speedBoostMultiplier = 4f;
     private float speedBoostEndTime = 0f;
     #endregion
 
