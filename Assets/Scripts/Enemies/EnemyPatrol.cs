@@ -28,9 +28,12 @@ public class EnemyPatrol : MonoBehaviour
     private MovementController playerMovementController;
     private bool playerCaught = false;
 
+    private Animator animator;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
         if (rb != null)
         {
             // Freeze rotation and keep Y position fixed for horizontal patrol.
@@ -72,6 +75,8 @@ public class EnemyPatrol : MonoBehaviour
 
         Patrol();
         DetectPlayer();
+
+        animator.SetFloat("xVelocity", Mathf.Abs(rb.linearVelocity.x));
     }
 
     #region Patrol Movement
