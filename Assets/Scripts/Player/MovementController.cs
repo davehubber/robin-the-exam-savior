@@ -74,6 +74,12 @@ public class MovementController : MonoBehaviour
         {
             animator.SetBool("isJumping", false);
         }
+
+        if (isSpeedBoosted) {
+            animator.SetFloat("isSpeedBoosted", 1f);
+        } else {
+            animator.SetFloat("isSpeedBoosted", 0f);
+        }
     }
 
     #region Movement Methods
