@@ -765,7 +765,7 @@ GameObject:
   - component: {fileID: 411309471}
   - component: {fileID: 411309470}
   m_Layer: 0
-  m_Name: Keycard
+  m_Name: USB
   m_TagString: Key
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
