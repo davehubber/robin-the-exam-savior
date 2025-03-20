@@ -2361,12 +2361,12 @@ MonoBehaviour:
   acceleration: 12.5
   groundSpeed: 6.5
   jumpSpeed: 12
-  groundDecay: 0.15
+  groundDecay: 0.125
   slowdownFactor: 0.15
   groundCheck: {fileID: 2018303947}
   groundMask:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 8
 --- !u!114 &1026778130
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4399,7 +4399,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.1533885, y: -0.65116477}
+  m_Offset: {x: -0.1533885, y: -0.64792854}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -4409,7 +4409,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.6290083, y: 1.3082824}
+  m_Size: {x: 0.6290083, y: 1.3018099}
   m_EdgeRadius: 0
 --- !u!1 &1499984188
 GameObject:
@@ -5785,7 +5785,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.047662735, y: -0.4470626}
+  m_Offset: {x: -0.14142531, y: -0.4490264}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -5795,7 +5795,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.46691704, y: 0.00713256}
+  m_Size: {x: 0.6291882, y: 0.0066132843}
   m_EdgeRadius: 0
 --- !u!1 &2026263388
 GameObject:

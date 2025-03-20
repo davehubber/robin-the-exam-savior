@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      classroom_ruler_1000_0: 1684913378622909456
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

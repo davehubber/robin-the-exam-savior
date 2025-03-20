@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      chewing-gum_0: -1031003158459965228
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

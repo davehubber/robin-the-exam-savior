@@ -222,7 +222,11 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      puddle-green-slime-liquid-toxic2_0: -7150070161722189049
+      puddle-green-slime-liquid-toxic2_1: 465798748934003119
+      puddle-green-slime-liquid-toxic2_2: -7344552329113411829
+      puddle-green-slime-liquid-toxic2_3: 3604760714591600149
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      classroom_scissors_1000_0: -6316809977742904114
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
