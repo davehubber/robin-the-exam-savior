@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class SpeedBoostCollectible : MonoBehaviour
 {
-    public float speedMultiplier = 2f;
-    public float duration = 5f;
+    public float speedMultiplier = 4f;
+    public float duration = 7f;
 
     private void OnTriggerEnter2D(Collider2D other)
     {

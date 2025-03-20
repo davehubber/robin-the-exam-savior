@@ -20,7 +20,7 @@ public class MovementController : MonoBehaviour
 
     #region Speed Boost
     private bool isSpeedBoosted = false;
-    private float speedBoostMultiplier = 1f;
+    private float speedBoostMultiplier = 4f;
     private float speedBoostEndTime = 0f;
     #endregion
 
@@ -31,9 +31,12 @@ public class MovementController : MonoBehaviour
     private bool isSlowDownActive = false;
     #endregion
 
+    private Animator animator;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
         if (groundCheck == null)
         {
             Debug.LogWarning($"{nameof(MovementController)} on {gameObject.name} has no groundCheck assigned.");
@@ -50,6 +53,7 @@ public class MovementController : MonoBehaviour
         // Process jump if grounded and not slowed.
         if (Input.GetButtonDown("Jump") && IsGrounded() && !isSlowDownActive)
         {
+            animator.SetBool("isJumping", !IsGrounded());
             Jump();
         }
 
@@ -62,6 +66,20 @@ public class MovementController : MonoBehaviour
 
         ApplyMovement();
         ApplyFriction();
+
+        animator.SetFloat("xVelocity", Mathf.Abs(rb.linearVelocity.x));
+        animator.SetFloat("yVelocity", rb.linearVelocity.y);
+
+        if (IsGrounded())
+        {
+            animator.SetBool("isJumping", false);
+        }
+
+        if (isSpeedBoosted) {
+            animator.SetFloat("isSpeedBoosted", 1f);
+        } else {
+            animator.SetFloat("isSpeedBoosted", 0f);
+        }
     }
 
     #region Movement Methods
@@ -86,6 +104,7 @@ public class MovementController : MonoBehaviour
     private void Jump()
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpSpeed);
+        animator.SetBool("isJumping", true);
     }
 
     private void ApplyFriction()

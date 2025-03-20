@@ -38,8 +38,8 @@ public class PlayerInteractionController : MonoBehaviour
     private Quaternion originalRotation;
     // Parameters for rope movement (set these in the inspector as needed).
     [Header("Rope Settings")]
-    public float ropeDefaultFallSpeed = 1f;   // Slow fall speed by default.
-    public float ropeClimbSpeed = 3f;         // Upward (and fast downward) speed when holding W/S.
+    public float ropeDefaultFallSpeed = 0.5f;   // Slow fall speed by default.
+    public float ropeClimbSpeed = 1f;         // Upward (and fast downward) speed when holding W/S.
     public float maxRopeDepth = 5f;           // Maximum distance below the RopeHole center.
     
     // A separate LineRenderer for rendering the rope.
@@ -68,8 +68,8 @@ public class PlayerInteractionController : MonoBehaviour
 
             // Set up a simple material for the line.
             aimLine.material = new Material(Shader.Find("Sprites/Default"));
-            aimLine.startColor = new Color(1f, 1f, 1f, 0.8f);
-            aimLine.endColor = new Color(1f, 1f, 1f, 0.8f);
+            aimLine.startColor = new Color(1f, 0f, 0f, 0.5f);
+            aimLine.endColor = new Color(1f, 0f, 0f, 0.5f);
         }
 
         // Setup ropeLine if not already assigned.
@@ -81,8 +81,8 @@ public class PlayerInteractionController : MonoBehaviour
             ropeLine.positionCount = 2;
             ropeLine.enabled = false;
             ropeLine.material = new Material(Shader.Find("Sprites/Default"));
-            ropeLine.startColor = new Color(1f, 1f, 1f, 0.8f);
-            ropeLine.endColor = new Color(1f, 1f, 1f, 0.8f);
+            ropeLine.startColor = new Color(0.54f, 0.27f, 0.07f, 1.0f);
+            ropeLine.endColor = new Color(0.72f, 0.52f, 0.04f, 1.0f);
             ropeLine.startWidth = 0.1f;
             ropeLine.endWidth = 0.1f;
         }

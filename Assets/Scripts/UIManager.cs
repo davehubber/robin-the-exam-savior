@@ -115,7 +115,7 @@ public class UIManager : MonoBehaviour
             {
                 if (playerWon)
                 {
-                    gameOverText.text = "VAULT CRACKED!";
+                    gameOverText.text = "EXAM STOLEN!";
                     gameOverText.color = Color.yellow;
                 }
                 else
