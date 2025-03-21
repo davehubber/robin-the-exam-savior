@@ -2,10 +2,8 @@ using UnityEngine;
 
 public class PlayerInteractionController : MonoBehaviour
 {
-    // The interactable object currently in range (set by the collision handler).
     private GameObject currentInteractable;
 
-    // --- Throwing mechanic fields ---
     [Header("Throwable Settings")]
     [SerializeField] private MovementController movementController;
     [SerializeField] private Transform throwPoint;
@@ -17,40 +15,29 @@ public class PlayerInteractionController : MonoBehaviour
 
     private bool isAiming = false;
     private float currentThrowForce = 0f;
-    // The throwable currently held by the player (if any).
     private Throwable heldThrowable = null;
 
-    // --- Hiding mechanic fields ---
     public bool isHidden = false;
     private int originalSortingOrder;
     private SpriteRenderer playerSprite;
 
-    // --- Rope mechanic fields ---
-    // Indicates whether the player is currently using the rope.
-    private bool isOnRope = false;
-    // When entering rope mode, we ignore the current W input until released.
+    public bool isOnRope = false;
     private bool ropeIgnoreW = true;
-    // The position the player will return to when leaving the rope.
     private Vector3 ropeExitPosition;
-    // The RopeHole's transform (its center).
     private Transform ropeHoleTransform;
-    // Store the original rotation so it can be restored.
     private Quaternion originalRotation;
-    // Parameters for rope movement (set these in the inspector as needed).
-    [Header("Rope Settings")]
-    public float ropeDefaultFallSpeed = 0.5f;   // Slow fall speed by default.
-    public float ropeClimbSpeed = 1f;         // Upward (and fast downward) speed when holding W/S.
-    public float maxRopeDepth = 5f;           // Maximum distance below the RopeHole center.
     
-    // A separate LineRenderer for rendering the rope.
+    [Header("Rope Settings")]
+    public float ropeDefaultFallSpeed = 0.5f;
+    public float ropeClimbSpeed = 1f;
+    public float maxRopeDepth = 5f;
+    
     [SerializeField] private LineRenderer ropeLine;
 
-    // Cached Rigidbody2D reference for rope mode movement.
     private Rigidbody2D rb;
 
     private void Awake()
     {
-        // Setup throw point if not already assigned.
         if (throwPoint == null)
         {
             GameObject throwPointObj = new GameObject("ThrowPoint");
@@ -59,20 +46,17 @@ public class PlayerInteractionController : MonoBehaviour
             throwPoint = throwPointObj.transform;
         }
 
-        // Setup the aim line if not already assigned.
         if (aimLine == null)
         {
             aimLine = gameObject.AddComponent<LineRenderer>();
-            aimLine.positionCount = 2; // Only need two points: start and end.
+            aimLine.positionCount = 2;
             aimLine.enabled = false;
 
-            // Set up a simple material for the line.
             aimLine.material = new Material(Shader.Find("Sprites/Default"));
             aimLine.startColor = new Color(1f, 0f, 0f, 0.5f);
             aimLine.endColor = new Color(1f, 0f, 0f, 0.5f);
         }
 
-        // Setup ropeLine if not already assigned.
         if (ropeLine == null)
         {
             GameObject ropeLineObj = new GameObject("RopeLine");
@@ -105,7 +89,6 @@ public class PlayerInteractionController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
-    // Called by the collision handler to update the current interactable.
     public void SetCurrentInteractable(GameObject interactable)
     {
         currentInteractable = interactable;
@@ -118,23 +101,19 @@ public class PlayerInteractionController : MonoBehaviour
 
     private void Update()
     {
-        // If the player is on the rope, process rope-specific input and movement.
         if (isOnRope)
         {
             ProcessRopeMovement();
             return;
         }
 
-        // Normal interaction: When "W" is pressed, perform the interaction.
         if (Input.GetKeyDown(KeyCode.W))
         {
             HandleInteraction();
         }
 
-        // If holding a throwable, handle aiming and throwing.
         if (heldThrowable != null)
         {
-            // Toggle aiming mode with T.
             if (Input.GetKeyDown(KeyCode.T))
             {
                 ToggleAiming();
@@ -144,7 +123,6 @@ public class PlayerInteractionController : MonoBehaviour
             {
                 HandleAiming();
 
-                // If left mouse button is pressed, throw the held object.
                 if (Input.GetMouseButtonDown(0))
                 {
                     ThrowHeldThrowable();
@@ -153,13 +131,11 @@ public class PlayerInteractionController : MonoBehaviour
         }
     }
 
-    // Determines the interaction based on the current interactable's tag.
     private void HandleInteraction()
     {
         if (currentInteractable == null)
             return;
 
-        // Portal interaction.
         if (currentInteractable.CompareTag("Portal"))
         {
             Portal portal = currentInteractable.GetComponent<Portal>();
@@ -168,12 +144,10 @@ public class PlayerInteractionController : MonoBehaviour
                 transform.position = portal.exitPoint.position;
             }
         }
-        // Hiding spot interaction.
         else if (currentInteractable.CompareTag("HidingSpot"))
         {
             ToggleHiding();
         }
-        // Throwable pickup.
         else if (currentInteractable.GetComponent<Throwable>() != null)
         {
             if (heldThrowable == null)
@@ -181,14 +155,12 @@ public class PlayerInteractionController : MonoBehaviour
                 PickupThrowable(currentInteractable);
             }
         }
-        // RopeHole interaction.
         else if (currentInteractable.CompareTag("RopeHole"))
         {
             EnterRopeMode(currentInteractable);
         }
     }
 
-    // Picks up a throwable object.
     private void PickupThrowable(GameObject throwableObject)
     {
         Throwable throwable = throwableObject.GetComponent<Throwable>();
@@ -208,7 +180,6 @@ public class PlayerInteractionController : MonoBehaviour
         {
             aimLine.enabled = true;
             
-            // Disable movement while aiming.
             if (movementController != null)
                 movementController.DisableMovement();
         }
@@ -216,7 +187,6 @@ public class PlayerInteractionController : MonoBehaviour
         {
             aimLine.enabled = false;
             
-            // Re-enable movement when not aiming.
             if (movementController != null)
                 movementController.EnableMovement();
         }
@@ -224,7 +194,6 @@ public class PlayerInteractionController : MonoBehaviour
 
     private void ToggleHiding()
     {
-        // Hiding logic here.
         SpriteRenderer hidingSpotSprite = currentInteractable.GetComponent<SpriteRenderer>();
         if (hidingSpotSprite == null)
         {
@@ -290,79 +259,60 @@ public class PlayerInteractionController : MonoBehaviour
         }
     }
 
-    // ========================
-    // Rope Mode Implementation
-    // ========================
-
-    // Called when the player interacts with a RopeHole.
     private void EnterRopeMode(GameObject ropeHole)
     {
-        // Begin rope mode.
         isOnRope = true;
-        ropeIgnoreW = true; // Ignore the current W press.
-        ropeExitPosition = transform.position; // Record original position.
+        ropeIgnoreW = true;
+        ropeExitPosition = transform.position;
         ropeHoleTransform = ropeHole.transform;
-        originalRotation = transform.rotation; // Save original rotation.
+        originalRotation = transform.rotation;
 
-        // Snap player to the center of the RopeHole.
         transform.position = ropeHoleTransform.position;
 
-        // Flip player's rotation based on facing direction.
         if (transform.localScale.x > 0)
             transform.rotation = Quaternion.Euler(0, 0, -90);
         else
             transform.rotation = Quaternion.Euler(0, 0, 90);
 
-        // Disable normal movement.
         if (movementController != null)
             movementController.DisableMovement();
 
-        // Disable ground collisions (assumes ground is on the "Ground" layer).
         int playerLayer = gameObject.layer;
         int groundLayer = LayerMask.NameToLayer("Ground");
         Physics2D.IgnoreLayerCollision(playerLayer, groundLayer, true);
 
-        // Make the Rigidbody kinematic to avoid physics interference.
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
 
-        // Enable rope line rendering.
         ropeLine.enabled = true;
         ropeLine.positionCount = 2;
         ropeLine.SetPosition(0, ropeHoleTransform.position);
         ropeLine.SetPosition(1, transform.position);
 
-        // Optionally, clear currentInteractable so that the RopeHole won't re-trigger immediately.
         currentInteractable = null;
     }
 
-    // Process input and movement while on the rope.
     private void ProcessRopeMovement()
     {
-        // Once the player releases W, stop ignoring it.
         if (ropeIgnoreW && !Input.GetKey(KeyCode.W))
         {
             ropeIgnoreW = false;
         }
 
         float verticalSpeed = 0f;
-        // If W is held (after the initial press is cancelled), move upward.
         if (!ropeIgnoreW && Input.GetKey(KeyCode.W))
         {
             verticalSpeed = ropeClimbSpeed;
         }
-        // If S is held, move downward faster.
         else if (Input.GetKey(KeyCode.S))
         {
             verticalSpeed = -ropeClimbSpeed;
         }
         else
         {
-            // Default slow fall.
             verticalSpeed = -ropeDefaultFallSpeed;
         }
 
-        // Compute new vertical position using rb.MovePosition for smoother movement.
         Vector2 pos = rb.position;
         pos.y += verticalSpeed * Time.deltaTime;
         float upperBound = ropeHoleTransform.position.y;
@@ -370,42 +320,32 @@ public class PlayerInteractionController : MonoBehaviour
         pos.y = Mathf.Clamp(pos.y, lowerBound, upperBound);
         rb.MovePosition(pos);
 
-        // Update rope line so it stretches from the hole to the player.
         ropeLine.SetPosition(1, pos);
 
-        // Use a threshold to check if the player has reached the top.
         if (Mathf.Abs(pos.y - upperBound) < 0.01f && Input.GetKey(KeyCode.W) && !ropeIgnoreW)
         {
             ExitRopeMode();
         }
     }
 
-    // Called when the rope mode is exited.
-    private void ExitRopeMode()
+    public void ExitRopeMode()
     {
         isOnRope = false;
 
-        // Disable rope line.
         ropeLine.enabled = false;
 
-        // Re-enable ground collisions.
         int playerLayer = gameObject.layer;
         int groundLayer = LayerMask.NameToLayer("Ground");
         Physics2D.IgnoreLayerCollision(playerLayer, groundLayer, false);
 
-        // Restore the original rotation.
         transform.rotation = originalRotation;
 
-        // Restore Rigidbody settings.
         rb.bodyType = RigidbodyType2D.Dynamic;
         rb.linearVelocity = Vector2.zero;
 
-        // Teleport the player back to the position they were at before entering rope mode.
         transform.position = ropeExitPosition;
 
-        // Re-enable normal movement.
         if (movementController != null)
             movementController.EnableMovement();
     }
-
 }

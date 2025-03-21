@@ -6,6 +6,13 @@ public class LaserTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            PlayerInteractionController playerInteractionController
+                = other.transform.parent.gameObject.GetComponent<PlayerInteractionController>();
+
+            if (playerInteractionController.isOnRope) {
+                playerInteractionController.ExitRopeMode();
+            }
+
             GameManager.Instance.GameOver(false, "You were hit by a laser!");
         }
     }

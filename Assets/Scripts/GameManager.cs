@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -14,16 +13,13 @@ public class GameManager : MonoBehaviour
     public bool isGameOver = false;
     public bool playerWon = false;
     
-    // Private variables
     private float currentTime;
     private float playerScore;
 
-    // Events
     public event Action OnKeyCollected;
     public event Action<bool, string> OnGameOver;
     public event Action<float> OnTimeUpdated;
     
-    // Singleton with proper scene loading handling
     public static GameManager Instance { get; private set; }
 
     private void Awake()
@@ -91,7 +87,7 @@ public class GameManager : MonoBehaviour
 
     public void GameOver(bool won, string customLossMessage = "")
     {
-        if (isGameOver) return; // Prevent multiple calls
+        if (isGameOver) return;
         
         isGameOver = true;
         playerWon = won;
@@ -106,6 +102,13 @@ public class GameManager : MonoBehaviour
         {
             playerScore = 0;
         }
+
+        GameObject player = GameObject.FindGameObjectWithTag("Player").transform.parent.gameObject;
+        MovementController playerMovementController = player.GetComponent<MovementController>();
+        Rigidbody2D playerRb = player.GetComponent<Rigidbody2D>();
+
+        playerMovementController.DisableMovement();
+        playerRb.simulated = false;
 
         OnGameOver?.Invoke(won, customLossMessage);
     }
@@ -124,10 +127,5 @@ public class GameManager : MonoBehaviour
     public float GetRemainingTime()
     {
         return timeLimit - currentTime;
-    }
-    
-    public void RestartGame()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
