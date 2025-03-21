@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class UIManager : MonoBehaviour
     public TMP_Text gameOverText;
     public TMP_Text scoreText;
     public Button restartButton;
+    public Button mainMenuButton;
     
     [Header("UI Animation")]
     public float pulseDuration = 0.5f;
@@ -21,10 +23,14 @@ public class UIManager : MonoBehaviour
     
     void Awake()
     {
-        // Setup restart button
         if (restartButton != null)
         {
             restartButton.onClick.AddListener(OnRestartButtonClicked);
+        }
+
+        if (mainMenuButton != null)
+        {
+            mainMenuButton.onClick.AddListener(OnMainMenuButtonClicked);
         }
     }
     
@@ -37,14 +43,12 @@ public class UIManager : MonoBehaviour
             return;
         }
         
-        // Initialize UI state
         UpdateKeyStatus(false);
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(false);
         }
         
-        // Subscribe to GameManager events
         gameManager.OnKeyCollected += OnKeyCollected;
         gameManager.OnGameOver += OnGameOver;
         gameManager.OnTimeUpdated += OnTimeUpdated;
@@ -52,7 +56,6 @@ public class UIManager : MonoBehaviour
 
     void OnDestroy()
     {
-        // Unsubscribe from events to prevent memory leaks
         if (gameManager != null)
         {
             gameManager.OnKeyCollected -= OnKeyCollected;
@@ -60,10 +63,14 @@ public class UIManager : MonoBehaviour
             gameManager.OnTimeUpdated -= OnTimeUpdated;
         }
         
-        // Remove button listeners
         if (restartButton != null)
         {
             restartButton.onClick.RemoveListener(OnRestartButtonClicked);
+        }
+
+        if (mainMenuButton != null)
+        {
+            mainMenuButton.onClick.RemoveListener(OnMainMenuButtonClicked);
         }
     }
     
@@ -81,9 +88,8 @@ public class UIManager : MonoBehaviour
         if (timerText != null)
         {
             TimeSpan timeSpan = TimeSpan.FromSeconds(currentTime);
-            timerText.text = string.Format("{0:00}:{1:00}", timeSpan.Minutes, timeSpan.Seconds);
+            timerText.text = string.Format("{0:00} : {1:00}", timeSpan.Minutes, timeSpan.Seconds);
             
-            // Change color when time is running out (last 30 seconds)
             if (gameManager.GetRemainingTime() <= 30f)
             {
                 timerText.color = Color.red;
@@ -101,7 +107,7 @@ public class UIManager : MonoBehaviour
         if (keyStatusText != null)
         {
             keyStatusText.text = hasKey ? "Key found! Now open the vault!" : "Find the key!";
-            keyStatusText.color = hasKey ? Color.yellow : Color.black;
+            keyStatusText.color = hasKey ? Color.yellow : Color.white;
         }
     }
     
@@ -127,7 +133,7 @@ public class UIManager : MonoBehaviour
             
             if (scoreText != null)
             {
-                scoreText.text = playerWon ? $"Score: {gameManager.GetScore()}" : "FAILED";
+                scoreText.text = $"Score: {gameManager.GetScore()}";
             }
         }
     }
@@ -145,7 +151,6 @@ public class UIManager : MonoBehaviour
         Vector3 originalScale = target.localScale;
         Vector3 targetScale = originalScale * pulseScale;
         
-        // Scale up
         float t = 0f;
         while (t < pulseDuration / 2)
         {
@@ -155,7 +160,6 @@ public class UIManager : MonoBehaviour
             yield return null;
         }
         
-        // Scale down
         t = 0f;
         while (t < pulseDuration / 2)
         {
@@ -165,15 +169,16 @@ public class UIManager : MonoBehaviour
             yield return null;
         }
         
-        // Ensure scale is reset to original
         target.localScale = originalScale;
     }
     
     private void OnRestartButtonClicked()
     {
-        if (gameManager != null)
-        {
-            gameManager.RestartGame();
-        }
+        SceneManager.LoadScene("Level");
+    }
+
+    private void OnMainMenuButtonClicked()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }

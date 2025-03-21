@@ -38,13 +38,4 @@ public class LasersController : MonoBehaviour
         laserTop.SetActive(isTopActive);
         laserBottom.SetActive(!isTopActive);
     }
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            Debug.Log("I'm dead ;_;");
-            GameManager.Instance.GameOver(false, "You were hit by a laser!");
-        }
-    }
 }
