@@ -194,7 +194,7 @@ public class PlayerInteractionController : MonoBehaviour
 
     private void ToggleHiding()
     {
-        SpriteRenderer hidingSpotSprite = currentInteractable.GetComponent<SpriteRenderer>();
+        SpriteRenderer hidingSpotSprite = currentInteractable.GetComponentInChildren<SpriteRenderer>();
         if (hidingSpotSprite == null)
         {
             Debug.LogWarning("PlayerInteractionController: HidingSpot does not have a SpriteRenderer.");
