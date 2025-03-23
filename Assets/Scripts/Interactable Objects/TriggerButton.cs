@@ -57,7 +57,7 @@ public class TriggerButton : MonoBehaviour
         // Change sprite to the pressed sprite.
         spriteRenderer.sprite = pressedButtonSprite;
         // Adjust position on the x-axis.
-        transform.position = originalPosition + new Vector3(0.15qf, 0f, 0f);
+        transform.position = originalPosition + new Vector3(0.15f, 0f, 0f);
 
         // Wait for the specified duration.
         yield return new WaitForSeconds(pressDuration);
