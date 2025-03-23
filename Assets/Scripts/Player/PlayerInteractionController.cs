@@ -28,8 +28,8 @@ public class PlayerInteractionController : MonoBehaviour
     private Quaternion originalRotation;
     
     [Header("Rope Settings")]
-    public float ropeDefaultFallSpeed = 0.5f;
-    public float ropeClimbSpeed = 1f;
+    public float ropeDefaultFallSpeed = 10f;
+    public float ropeClimbSpeed = 20f;
     public float maxRopeDepth = 5f;
     
     [SerializeField] private LineRenderer ropeLine;
