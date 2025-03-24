@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class EnemyPatrol : MonoBehaviour
+public class SecurityController : MonoBehaviour
 {
     [Header("Patrol Settings")]
     [SerializeField] private Transform pointA;

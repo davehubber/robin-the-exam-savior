@@ -4,8 +4,8 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     [Header("Game Settings")]
-    public float timeLimit = 120f;
-    public float maxScore = 1000f;
+    public float timeLimit = 180f;
+    public float maxScore = 5000f;
 
     [Header("Game State")]
     public bool hasKey = false;
@@ -52,7 +52,7 @@ public class GameManager : MonoBehaviour
 
     private void InitializeGame()
     {
-        currentTime = 0f;
+        currentTime = timeLimit;
         hasKey = false;
         isVaultOpen = false;
         isGameOver = false;
@@ -61,13 +61,13 @@ public class GameManager : MonoBehaviour
 
     private void UpdateTimer()
     {
-        currentTime += Time.deltaTime;
+        currentTime -= Time.deltaTime;
         OnTimeUpdated?.Invoke(currentTime);
     }
 
     private void CheckTimeLimit()
     {
-        if (currentTime >= timeLimit && !playerWon)
+        if (currentTime <= 0 && !playerWon)
         {
             GameOver(false);
         }
@@ -98,7 +98,7 @@ public class GameManager : MonoBehaviour
 
         if (won)
         {
-            float remainingTimePercentage = (timeLimit - currentTime) / timeLimit;
+            float remainingTimePercentage = currentTime / timeLimit;
             playerScore = Mathf.Round(maxScore * remainingTimePercentage);
             playerScore = Mathf.Max(playerScore, 100);
             audioManager.PlaySFX(audioManager.victory);
@@ -117,6 +117,8 @@ public class GameManager : MonoBehaviour
         playerRb.simulated = false;
 
         OnGameOver?.Invoke(won, customLossMessage);
+
+        Cursor.visible = true;
     }
 
     public float GetScore()
@@ -132,6 +134,11 @@ public class GameManager : MonoBehaviour
 
     public float GetRemainingTime()
     {
-        return timeLimit - currentTime;
+        return currentTime;
+    }
+
+    public void IncreaseTime(float additionalTime)
+    {
+        currentTime += additionalTime;
     }
 }

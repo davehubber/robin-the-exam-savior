@@ -8,7 +8,6 @@ public class Desktop : MonoBehaviour
     public Sprite unlockedSprite;
 
     [Header("Feedback")]
-    public GameObject interactionPrompt;
     public GameObject lockEffect;
     public GameObject unlockEffect;
 
@@ -22,11 +21,6 @@ public class Desktop : MonoBehaviour
         if (spriteRenderer != null && lockedSprite != null)
         {
             spriteRenderer.sprite = lockedSprite;
-        }
-
-        if (interactionPrompt != null)
-        {
-            interactionPrompt.SetActive(false);
         }
 
         if (lockEffect != null)
@@ -98,11 +92,6 @@ public class Desktop : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             playerInRange = true;
-
-            if (interactionPrompt != null)
-            {
-                interactionPrompt.SetActive(true);
-            }
         }
     }
 
@@ -111,11 +100,6 @@ public class Desktop : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             playerInRange = false;
-
-            if (interactionPrompt != null)
-            {
-                interactionPrompt.SetActive(false);
-            }
         }
     }
 }

@@ -109,6 +109,8 @@ public class TriggerButton : MonoBehaviour
         {
             StartCoroutine(PressButton());
         }
+
+        Destroy(collision.gameObject);
     }
     
     private IEnumerator FadeOutBlockade()

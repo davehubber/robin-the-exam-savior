@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SpeedBoostCollectible : MonoBehaviour
+public class SpeedBoostPowerUp : MonoBehaviour
 {
     public float speedMultiplier = 4f;
     public float duration = 7f;
