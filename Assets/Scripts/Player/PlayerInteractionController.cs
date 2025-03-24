@@ -141,6 +141,12 @@ public class PlayerInteractionController : MonoBehaviour
             Portal portal = currentInteractable.GetComponent<Portal>();
             if (portal != null && portal.exitPoint != null)
             {
+                var indicator = portal.GetComponent<InteractableIndicator>();
+                if (indicator != null)
+                {
+                    indicator.HideIndicator();
+                }
+
                 transform.position = portal.exitPoint.position;
             }
         }

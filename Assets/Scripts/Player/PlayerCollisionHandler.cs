@@ -23,6 +23,13 @@ public class PlayerCollisionHandler : MonoBehaviour
         else if (other.gameObject.layer == LayerMask.NameToLayer("Interactable"))
         {
             interactionController.SetCurrentInteractable(other.gameObject);
+            
+            // Get the indicator component and trigger the fade-in effect.
+            var indicator = other.GetComponent<InteractableIndicator>();
+            if (indicator != null)
+            {
+                indicator.ShowIndicator();
+            }
         }
     }
 
@@ -32,9 +39,15 @@ public class PlayerCollisionHandler : MonoBehaviour
         {
             movementController.SetSlowDown(false);
         }
-        else if ((other.gameObject.layer == LayerMask.NameToLayer("Interactable")) && 
-                 interactionController.GetCurrentInteractable() == other.gameObject)
+        else if (other.gameObject.layer == LayerMask.NameToLayer("Interactable") && 
+                interactionController.GetCurrentInteractable() == other.gameObject)
         {
+            // Trigger the fade-out effect.
+            var indicator = other.GetComponent<InteractableIndicator>();
+            if (indicator != null)
+            {
+                indicator.HideIndicator();
+            }
             interactionController.SetCurrentInteractable(null);
         }
     }

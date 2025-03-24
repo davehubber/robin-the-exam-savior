@@ -30,6 +30,12 @@ public class Throwable : MonoBehaviour
     {
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
+
+        var indicator = GetComponent<InteractableIndicator>();
+        if (indicator != null)
+        {
+            indicator.HideIndicator();
+        }
     }
 
     public void Launch(Vector2 direction, float force)
