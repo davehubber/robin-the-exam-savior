@@ -5,12 +5,11 @@ public class LasersController : MonoBehaviour
     public GameObject laserTop;
     public GameObject laserBottom;
     
-    public float switchInterval = 3.0f; // Time in seconds before switching
+    public float switchInterval = 3.0f;
 
     private bool isTopActive = false;
     private float timer;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         laserTop = transform.Find("LaserTop").gameObject;
@@ -20,7 +19,6 @@ public class LasersController : MonoBehaviour
         timer = switchInterval;
     }
 
-    // Update is called once per frame
     void Update()
     {
         timer -= Time.deltaTime;

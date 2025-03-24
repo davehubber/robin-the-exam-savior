@@ -30,6 +30,15 @@ public class PlayerCollisionHandler : MonoBehaviour
             {
                 indicator.ShowIndicator();
             }
+
+            if (other.CompareTag("Portal"))
+            {
+                var portalIndicator = other.GetComponent<PortalIndicator>();
+                if (portalIndicator != null)
+                {
+                    portalIndicator.ShowArrow();
+                }
+            }
         }
     }
 
@@ -49,6 +58,15 @@ public class PlayerCollisionHandler : MonoBehaviour
                 indicator.HideIndicator();
             }
             interactionController.SetCurrentInteractable(null);
+
+            if (other.CompareTag("Portal"))
+            {
+                var portalIndicator = other.GetComponent<PortalIndicator>();
+                if (portalIndicator != null)
+                {
+                    portalIndicator.HideArrow();
+                }
+            }
         }
     }
 }

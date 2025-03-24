@@ -18,10 +18,10 @@ public class EnemyPatrol : MonoBehaviour
 
     [Header("Patrol Area Visualization")]
     [SerializeField] private SpriteRenderer patrolAreaIndicator;
-    [SerializeField] private Color safeColor = new Color(0, 1, 0, 0.3f); // Green, semi-transparent
-    [SerializeField] private Color dangerColor = new Color(1, 1, 0, 0.3f); // Yellow, semi-transparent
-    [SerializeField] private Color caughtColor = new Color(1, 0, 0, 0.3f); // Red, semi-transparent
-    [SerializeField] private float indicatorYOffset = -0.5f; // How far below the enemy the indicator should be
+    [SerializeField] private Color safeColor = new Color(0, 1, 0, 0.3f);
+    [SerializeField] private Color dangerColor = new Color(1, 1, 0, 0.3f);
+    [SerializeField] private Color caughtColor = new Color(1, 0, 0, 0.3f);
+    [SerializeField] private float indicatorYOffset = -0.5f;
 
     private Rigidbody2D rb;
     private Transform currentTarget;
@@ -47,14 +47,12 @@ public class EnemyPatrol : MonoBehaviour
             playerTransform = playerObj.transform.parent.gameObject.transform;
         }
 
-        // Initialize patrol area indicator if it's null
         if (patrolAreaIndicator == null)
         {
             Debug.LogWarning("Patrol Area Indicator not assigned. Create and assign a child GameObject with a SpriteRenderer.");
         }
         else
         {
-            // Set initial size of the patrol area indicator
             UpdatePatrolAreaIndicator();
         }
     }
@@ -75,7 +73,6 @@ public class EnemyPatrol : MonoBehaviour
         isFacingPlayer = IsFacingPlayer();
         DetectPlayer();
 
-        // Update the patrol area indicator color
         UpdatePatrolAreaColor();
 
         animator.SetFloat("xVelocity", Mathf.Abs(rb.linearVelocity.x));
@@ -162,15 +159,12 @@ public class EnemyPatrol : MonoBehaviour
     {
         if (patrolAreaIndicator == null || pointA == null || pointB == null) return;
 
-        // Calculate the width of the patrol area
         float width = Mathf.Abs(pointB.position.x - pointA.position.x) + (pathMarginX * 2);
         
-        // Set the position of the indicator to be centered between pointA and pointB
         Vector3 midPoint = (pointA.position + pointB.position) / 2;
-        midPoint.y += indicatorYOffset; // Position it slightly below the patrol path
+        midPoint.y += indicatorYOffset;
         patrolAreaIndicator.transform.position = midPoint;
         
-        // Set the size of the indicator
         Vector3 localScale = patrolAreaIndicator.transform.localScale;
         localScale.x = width;
         patrolAreaIndicator.transform.localScale = localScale;
