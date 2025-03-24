@@ -13,7 +13,7 @@ TagManager:
   - HidingSpot
   - BubbleGum
   - RopeHole
-  - CircuitPuzzle
+  - Audio
   layers:
   - Default
   - TransparentFX

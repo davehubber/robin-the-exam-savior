@@ -16,11 +16,19 @@ public class EnemyPatrol : MonoBehaviour
     [SerializeField] private float pathMarginX = 0.5f;
     [SerializeField] private float pathMarginY = 1.0f;
 
+    [Header("Patrol Area Visualization")]
+    [SerializeField] private SpriteRenderer patrolAreaIndicator;
+    [SerializeField] private Color safeColor = new Color(0, 1, 0, 0.3f);
+    [SerializeField] private Color dangerColor = new Color(1, 1, 0, 0.3f);
+    [SerializeField] private Color caughtColor = new Color(1, 0, 0, 0.3f);
+    [SerializeField] private float indicatorYOffset = -0.5f;
+
     private Rigidbody2D rb;
     private Transform currentTarget;
     private Vector3 originalPosition;
     private Transform playerTransform;
     private bool playerCaught = false;
+    private bool isFacingPlayer = false;
 
     private Animator animator;
 
@@ -33,10 +41,19 @@ public class EnemyPatrol : MonoBehaviour
         currentTarget = pointB;
         originalPosition = transform.position;
 
-        GameObject playerObj = GameObject.FindGameObjectWithTag(playerTag).transform.parent.gameObject;
+        GameObject playerObj = GameObject.FindGameObjectWithTag(playerTag);
         if (playerObj != null)
         {
-            playerTransform = playerObj.transform;
+            playerTransform = playerObj.transform.parent.gameObject.transform;
+        }
+
+        if (patrolAreaIndicator == null)
+        {
+            Debug.LogWarning("Patrol Area Indicator not assigned. Create and assign a child GameObject with a SpriteRenderer.");
+        }
+        else
+        {
+            UpdatePatrolAreaIndicator();
         }
     }
 
@@ -45,11 +62,18 @@ public class EnemyPatrol : MonoBehaviour
         if ((GameManager.Instance != null && GameManager.Instance.isGameOver) || playerCaught)
         {
             rb.linearVelocity = Vector2.zero;
+            if (patrolAreaIndicator != null)
+            {
+                patrolAreaIndicator.color = caughtColor;
+            }
             return;
         }
 
         Patrol();
+        isFacingPlayer = IsFacingPlayer();
         DetectPlayer();
+
+        UpdatePatrolAreaColor();
 
         animator.SetFloat("xVelocity", Mathf.Abs(rb.linearVelocity.x));
     }
@@ -87,7 +111,7 @@ public class EnemyPatrol : MonoBehaviour
         if (playerTransform.GetComponent<PlayerInteractionController>().isHidden) return;
 
         float distanceToPlayer = Vector2.Distance(transform.position, playerTransform.position);
-        if (distanceToPlayer <= detectionRange && IsPlayerInPatrolPath() && IsFacingPlayer())
+        if (distanceToPlayer <= detectionRange && IsPlayerInPatrolPath() && isFacingPlayer)
         {
             CatchPlayer();
         }
@@ -106,6 +130,8 @@ public class EnemyPatrol : MonoBehaviour
 
     private bool IsFacingPlayer()
     {
+        if (playerTransform == null) return false;
+        
         bool enemyFacingRight = transform.localScale.x > 0;
         bool playerIsRight = playerTransform.position.x > transform.position.x;
         return enemyFacingRight == playerIsRight;
@@ -127,6 +153,39 @@ public class EnemyPatrol : MonoBehaviour
         Vector3 scale = transform.localScale;
         scale.x *= -1;
         transform.localScale = scale;
+    }
+
+    private void UpdatePatrolAreaIndicator()
+    {
+        if (patrolAreaIndicator == null || pointA == null || pointB == null) return;
+
+        float width = Mathf.Abs(pointB.position.x - pointA.position.x) + (pathMarginX * 2);
+        
+        Vector3 midPoint = (pointA.position + pointB.position) / 2;
+        midPoint.y += indicatorYOffset;
+        patrolAreaIndicator.transform.position = midPoint;
+        
+        Vector3 localScale = patrolAreaIndicator.transform.localScale;
+        localScale.x = width;
+        patrolAreaIndicator.transform.localScale = localScale;
+    }
+
+    private void UpdatePatrolAreaColor()
+    {
+        if (patrolAreaIndicator == null) return;
+
+        if (playerCaught)
+        {
+            patrolAreaIndicator.color = caughtColor;
+        }
+        else if (isFacingPlayer)
+        {
+            patrolAreaIndicator.color = dangerColor;
+        }
+        else
+        {
+            patrolAreaIndicator.color = safeColor;
+        }
     }
 
     private void OnDrawGizmos()

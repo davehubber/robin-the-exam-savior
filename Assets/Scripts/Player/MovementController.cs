@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class MovementController : MonoBehaviour
@@ -14,6 +15,12 @@ public class MovementController : MonoBehaviour
     [SerializeField] private BoxCollider2D groundCheck;
     [SerializeField] private LayerMask groundMask;
 
+    [Header("Slow Effect Visual")]
+    [SerializeField] private float flashDuration = 0.1f;
+    [SerializeField] private float flashInterval = 0.2f;
+    [SerializeField] private Color slowEffectColor = Color.white;
+    [SerializeField] private bool showSlowEffect = true;
+
     private bool isSpeedBoosted = false;
     private float speedBoostMultiplier = 4f;
     private float speedBoostEndTime = 0f;
@@ -24,11 +31,28 @@ public class MovementController : MonoBehaviour
     private bool isSlowDownActive = false;
 
     private Animator animator;
+    
+    // Variables for flash effect
+    private SpriteRenderer playerSprite;
+    private Color originalColor;
+    private Coroutine flashCoroutine;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        
+        // Get the player sprite renderer (can be on a child object)
+        playerSprite = GetComponentInChildren<SpriteRenderer>();
+        if (playerSprite != null)
+        {
+            originalColor = playerSprite.color;
+        }
+        else
+        {
+            Debug.LogWarning($"{nameof(MovementController)} on {gameObject.name} could not find a SpriteRenderer component.");
+        }
+        
         if (groundCheck == null)
         {
             Debug.LogWarning($"{nameof(MovementController)} on {gameObject.name} has no groundCheck assigned.");
@@ -132,7 +156,67 @@ public class MovementController : MonoBehaviour
         animator.SetFloat("yVelocity", 0);
     }
 
-    public void SetSlowDown(bool active) => isSlowDownActive = active;
+    public void SetSlowDown(bool active)
+    {
+        // Only process if the state changes
+        if (isSlowDownActive != active)
+        {
+            isSlowDownActive = active;
+            
+            // Show flashing effect
+            if (showSlowEffect && playerSprite != null)
+            {
+                if (isSlowDownActive)
+                {
+                    StartFlashingEffect();
+                }
+                else
+                {
+                    StopFlashingEffect();
+                }
+            }
+        }
+    }
+
+    private void StartFlashingEffect()
+    {
+        if (playerSprite == null) return;
+
+        // Stop any existing flashing coroutine
+        StopFlashingEffect();
+        
+        // Start the flashing coroutine
+        flashCoroutine = StartCoroutine(FlashRoutine());
+    }
+
+    private void StopFlashingEffect()
+    {
+        if (flashCoroutine != null)
+        {
+            StopCoroutine(flashCoroutine);
+            flashCoroutine = null;
+        }
+
+        // Reset to original color
+        if (playerSprite != null)
+        {
+            playerSprite.color = originalColor;
+        }
+    }
+
+    private IEnumerator FlashRoutine()
+    {
+        while (isSlowDownActive)
+        {
+            // Flash to white
+            playerSprite.color = slowEffectColor;
+            yield return new WaitForSeconds(flashDuration);
+            
+            // Return to original color
+            playerSprite.color = originalColor;
+            yield return new WaitForSeconds(flashInterval);
+        }
+    }
 
     private void OnDrawGizmosSelected()
     {
@@ -141,5 +225,11 @@ public class MovementController : MonoBehaviour
             Gizmos.color = Color.green;
             Gizmos.DrawWireCube(groundCheck.bounds.center, groundCheck.bounds.size);
         }
+    }
+    
+    private void OnDisable()
+    {
+        // Make sure we stop any running coroutines when disabled
+        StopFlashingEffect();
     }
 }

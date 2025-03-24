@@ -3,8 +3,8 @@ using UnityEngine;
 public class SecurityCamera : MonoBehaviour
 {
     [Header("Viewing Area Settings")]
-    [SerializeField] private GameObject viewingArea; // Assign the child object representing the viewing area.
-    [SerializeField] private Color idleColor = new Color(1f, 1f, 0f, 0.5f); // Yellow with transparency.
+    [SerializeField] private GameObject viewingArea;
+    [SerializeField] private Color idleColor = new Color(1f, 1f, 0f, 0.5f);
     [SerializeField] private Color alertColor = Color.red;
     [SerializeField] private string defeatMessage = "Caught by the security camera!";
 
@@ -31,7 +31,6 @@ public class SecurityCamera : MonoBehaviour
         }
     }
 
-    // This method is called by the ViewingAreaTrigger when the player enters the viewing area.
     public void OnPlayerDetected(GameObject player)
     {
         if (!isActive)
@@ -42,22 +41,18 @@ public class SecurityCamera : MonoBehaviour
             viewingAreaRenderer.color = alertColor;
         }
 
-        // Trigger game over with the custom defeat message.
         if (GameManager.Instance != null)
         {
             GameManager.Instance.GameOver(false, defeatMessage);
         }
     }
 
-    // If the security camera collides with a BubbleGum object, it deactivates.
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("BubbleGum"))
         {
-            // Destroy the BubbleGum object.
             Destroy(collision.gameObject);
 
-            // Turn the camera grey.
             SpriteRenderer cameraRenderer = GetComponent<SpriteRenderer>();
             if (cameraRenderer != null)
             {
@@ -68,7 +63,6 @@ public class SecurityCamera : MonoBehaviour
                 Debug.LogWarning("SecurityCamera: No SpriteRenderer found on the camera.");
             }
             
-            // Deactivate further detection.
             DeactivateCamera();
         }
     }
@@ -77,13 +71,11 @@ public class SecurityCamera : MonoBehaviour
     {
         isActive = false;
 
-        // Destroy the viewing area so it no longer detects the player.
         if (viewingArea != null)
         {
             Destroy(viewingArea);
         }
 
-        // Optionally disable further behavior.
-        this.enabled = false;
+        enabled = false;
     }
 }
