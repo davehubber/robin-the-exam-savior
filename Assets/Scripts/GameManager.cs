@@ -22,6 +22,8 @@ public class GameManager : MonoBehaviour
     
     public static GameManager Instance { get; private set; }
 
+    AudioManager audioManager;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -31,6 +33,7 @@ public class GameManager : MonoBehaviour
         }
         
         Instance = this;
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
     }
 
     void Start()
@@ -74,6 +77,7 @@ public class GameManager : MonoBehaviour
     {
         hasKey = true;
         OnKeyCollected?.Invoke();
+        audioManager.PlaySFX(audioManager.key);
     }
 
     public void OpenVault()
@@ -97,10 +101,12 @@ public class GameManager : MonoBehaviour
             float remainingTimePercentage = (timeLimit - currentTime) / timeLimit;
             playerScore = Mathf.Round(maxScore * remainingTimePercentage);
             playerScore = Mathf.Max(playerScore, 100);
+            audioManager.PlaySFX(audioManager.victory);
         }
         else
         {
             playerScore = 0;
+            audioManager.PlaySFX(audioManager.defeat);
         }
 
         GameObject player = GameObject.FindGameObjectWithTag("Player").transform.parent.gameObject;
