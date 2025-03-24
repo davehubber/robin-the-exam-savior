@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      coiled-rope_0: -686713760672983847
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
